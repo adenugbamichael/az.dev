@@ -1,6 +1,5 @@
-/** GIA NOTES
- *
- * Use the code below to start a bare-bone express web server
+import { graphqlHTTP } from 'express-graphql';
+import { schema, rootValue } from './schema';
 
 import express from 'express';
 import bodyParser from 'body-parser';
@@ -17,17 +16,18 @@ async function main() {
   server.use(bodyParser.json());
   server.use('/:fav.ico', (req, res) => res.sendStatus(204));
 
-  // Example route
-  server.use('/', (req, res) => {
-    res.send('Hello World');
-  });
+  server.use(
+    '/',
+    graphqlHTTP({
+      schema,
+      rootValue,
+      graphiql: true,
+    })
+  );
 
-  // This line rus the server
   server.listen(config.port, () => {
     console.log(`Server URL: http://localhost:${config.port}/`);
   });
 }
 
 main();
-
-*/
