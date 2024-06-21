@@ -1,14 +1,36 @@
-import { buildSchema } from 'graphql';
+import { GraphQLSchema,
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLInt,
+  // printSchema,
+  GraphQLNonNull, } from "graphql"
+  import NumbersInRange from "./types/numbers-in-range"
+  import { numbersInRangeObject } from "../utils"
 
-export const schema = buildSchema(`
-  type Query {
-    currentTime: String!
-  }
-`);
 
-export const rootValue = {
-  currentTime: () => {
-    const isoString = new Date().toISOString();
-    return isoString.slice(11, 19);
+const QueryType = new GraphQLObjectType({
+  name: "Query",
+  fields: {
+    currentTime: {
+      type: GraphQLString,
+      resolve: () => {
+        const isoString = new Date().toISOString()
+        return isoString.slice(11, 19)
+      },
+    },
+   numbersInRange: {
+    type: NumbersInRange,
+    args: {
+      begin: {type: new GraphQLNonNull(GraphQLInt)},
+      end: {type: new GraphQLNonNull(GraphQLInt)}
+    },
+    resolve: function (source, {begin, end}) {
+      return numbersInRangeObject(begin, end)
+    },
+   },
   },
-};
+})
+// console.log(printSchema(schema));
+export const schema = new GraphQLSchema({
+  query: QueryType,
+})
