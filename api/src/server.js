@@ -22,13 +22,16 @@ async function main() {
   server.use("/", (req, res) => {
     const loaders = {
       users: new DataLoader((userIds) => pgApi.usersInfo(userIds)),
-      approachLists: new DataLoader((taskIds) => 
-        pgApi.approachLists(taskIds)),
+      approachLists: new DataLoader((taskIds) => pgApi.approachLists(taskIds)),
       tasks: new DataLoader((taskIds) => pgApi.tasksInfo(taskIds)),
+      tasksByTypes: new DataLoader((types) => pgApi.tasksByTypes(types)),
+      searchResults: new DataLoader((searchTerms) =>
+        pgApi.searchResults(searchTerms)
+      ),
     }
     graphqlHTTP({
       schema,
-      context: { pgApi, loaders },
+      context: { loaders },
       graphiql: true,
       customFormatErrorFn: (err) => {
         const errorReport = {
