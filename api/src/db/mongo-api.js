@@ -57,6 +57,9 @@ const mongoApiWrapper = async () => {
         return approachDetails
       })
     },
+    mutators: {
+      
+    }
   }
 }
 export default mongoApiWrapper
