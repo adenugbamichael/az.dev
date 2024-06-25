@@ -47,6 +47,9 @@ async function main() {
       detailLists: new DataLoader((approachIds) =>
         mongoApi.detailLists(approachIds)
       ),
+      tasksForUsers: new DataLoader((userIds) => 
+        pgApi.tasksForUsers(userIds),
+      ),
     }
     const mutators = {
       ...pgApi.mutators,
@@ -55,7 +58,7 @@ async function main() {
 
     graphqlHTTP({
       schema,
-      context: { loaders, mutators },
+      context: { loaders, mutators, currentUser },
       graphiql: { headerEditorEnabled: true },
       customFormatErrorFn: (err) => {
         const errorReport = {

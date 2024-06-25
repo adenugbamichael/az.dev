@@ -26,6 +26,14 @@ const pgApiWrapper = async () => {
       })
       return Promise.all(results)
     },
+    tasksForUsers: async (userIds) => {
+      const pgResp = await pgQuery(sqls.tasksForUsers, {
+        $1: userIds,
+      })
+      return userIds.map((userId) =>
+        pgResp.rows.filter((row) => userId === row.userId)
+      )
+    },
     usersInfo: async (userIds) => {
       const pgResp = await pgQuery(sqls.usersFromIds, { $1: userIds })
       return userIds.map((userId) =>
@@ -40,7 +48,7 @@ const pgApiWrapper = async () => {
         pgResp.rows.filter((row) => taskId === row.taskId)
       )
     },
-    tasksInfo: async ({taskIds, currentUser}) => {
+    tasksInfo: async ({ taskIds, currentUser }) => {
       const pgResp = await pgQuery(sqls.tasksFromIds, {
         $1: taskIds,
         $2: currentUser ? currentUser.id : null,
@@ -49,7 +57,7 @@ const pgApiWrapper = async () => {
         pgResp.rows.find((row) => taskId == row.id)
       )
     },
-    searchResults: async ({searchTerms, currentUser}) => {
+    searchResults: async ({ searchTerms, currentUser }) => {
       const results = searchTerms.map(async (searchTerm) => {
         const pgResp = await pgQuery(sqls.searchResults, {
           $1: searchTerm,
@@ -112,7 +120,6 @@ const pgApiWrapper = async () => {
         }
         return payload
       },
-      
     },
   }
 }
