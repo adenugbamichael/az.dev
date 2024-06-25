@@ -7,6 +7,15 @@ const pgApiWrapper = async () => {
   const pgQuery = (text, params = {}) =>
     pgPool.query(text, Object.values(params))
   return {
+    userFromAuthToken: async (authToken) => {
+      if (!authToken) {
+        return null
+      }
+      const pgResp = await pgQuery(sqls.userFromAuthToken, {
+        $1: authToken,
+      })
+      return pgResp.rows[0]
+    },
     tasksByTypes: async (types) => {
       const results = types.map(async (type) => {
         if (type === "latest") {
@@ -31,20 +40,20 @@ const pgApiWrapper = async () => {
         pgResp.rows.filter((row) => taskId === row.taskId)
       )
     },
-    tasksInfo: async (taskIds) => {
+    tasksInfo: async ({taskIds, currentUser}) => {
       const pgResp = await pgQuery(sqls.tasksFromIds, {
         $1: taskIds,
-        $2: null, // TODO: pass logged-in userId here.
+        $2: currentUser ? currentUser.id : null,
       })
       return taskIds.map((taskId) =>
         pgResp.rows.find((row) => taskId == row.id)
       )
     },
-    searchResults: async (searchTerms) => {
+    searchResults: async ({searchTerms, currentUser}) => {
       const results = searchTerms.map(async (searchTerm) => {
         const pgResp = await pgQuery(sqls.searchResults, {
           $1: searchTerm,
-          $2: null, // TODO: pass logged-in userId here.
+          $2: currentUser ? currentUser.id : null,
         })
         return pgResp.rows
       })
@@ -103,6 +112,7 @@ const pgApiWrapper = async () => {
         }
         return payload
       },
+      
     },
   }
 }
