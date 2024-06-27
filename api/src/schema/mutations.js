@@ -6,6 +6,7 @@ import TaskInput from "./types/input-task"
 import TaskPayload from "./types/payload-task"
 import ApproachPayload from "./types/payload-approach"
 import ApproachDetailInput from "./types/input-approach-detail"
+import ApproachVoteInputType from "./types/input-approach-vote"
 
 const MutationType = new GraphQLObjectType({
   name: "Mutation",
@@ -51,6 +52,16 @@ const MutationType = new GraphQLObjectType({
           currentUser,
           mutators,
         })
+      },
+    },
+    approachVote: {
+      type: ApproachPayload,
+      args: {
+        approachId: { type: new GraphQLNonNull(GraphQLID) },
+        input: { type: new GraphQLNonNull(ApproachVoteInputType) },
+      },
+      resolve: async (source, { approachId, input }, { mutators }) => {
+        return mutators.approachVote({ approachId, input })
       },
     },
   }),
