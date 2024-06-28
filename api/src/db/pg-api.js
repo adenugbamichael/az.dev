@@ -77,16 +77,20 @@ const pgApiWrapper = async () => {
         }
         if (payload.errors.length === 0) {
           const authToken = randomString()
-          const pgResp = await pgQuery(sqls.userInsert, {
-            $1: input.username.toLowerCase(),
-            $2: input.password,
-            $3: input.firstName,
-            $4: input.lastName,
-            $5: authToken,
-          })
-          if (pgResp.rows[0]) {
-            payload.user = pgResp.rows[0]
-            payload.authToken = authToken
+          try {
+            const pgResp = await pgQuery(sqls.userInsert, {
+              $1: input.username.toLowerCase(),
+              $2: input.password,
+              $3: input.firstName,
+              $4: input.lastName,
+              $5: authToken,
+            })
+            if (pgResp.rows[0]) {
+              payload.user = pgResp.rows[0]
+              payload.authToken = authToken
+            }
+          } catch (err) {
+            console.log(err)
           }
         }
         return payload
