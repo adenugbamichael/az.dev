@@ -4,19 +4,26 @@ import TaskSummary, { TASK_SUMMARY_FRAGMENT } from "./TaskSummary"
 import { useStore } from "../store"
 import NewApproach from "./NewApproach"
 
+export const FULL_TASK_FRAGMENT = `
+fragment FullTaskData on Task {
+id
+...TaskSummary
+approachList {
+id
+...ApproachFragment
+}
+}
+${TASK_SUMMARY_FRAGMENT}
+${APPROACH_FRAGMENT}
+`
+
 const TASK_INFO = `
 query taskInfo($taskId: ID!) {
     taskInfo(id: $taskId) {
-    id
-    ...TaskSummary
-    approachList {
-    id
-    ...ApproachFragment
-    }
+ ...FullTaskData
    }
   }
-  ${TASK_SUMMARY_FRAGMENT}
-  ${APPROACH_FRAGMENT}
+  ${FULL_TASK_FRAGMENT}
 `
 
 export default function TaskPage({ taskId }) {
