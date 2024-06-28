@@ -1,27 +1,28 @@
 import React, { useState, useEffect } from "react"
-import Approach, { APPROACH_FRAGMENT } from "./Approach"
-import TaskSummary, { TASK_SUMMARY_FRAGMENT } from "./TaskSummary"
+
 import { useStore } from "../store"
 import NewApproach from "./NewApproach"
+import Approach, { APPROACH_FRAGMENT } from "./Approach"
+import TaskSummary, { TASK_SUMMARY_FRAGMENT } from "./TaskSummary"
 
 export const FULL_TASK_FRAGMENT = `
-fragment FullTaskData on Task {
-id
-...TaskSummary
-approachList {
-id
-...ApproachFragment
-}
-}
-${TASK_SUMMARY_FRAGMENT}
-${APPROACH_FRAGMENT}
+  fragment FullTaskData on Task {
+    id
+    ...TaskSummary
+    approachList {
+      id
+      ...ApproachFragment
+    }
+  }
+  ${TASK_SUMMARY_FRAGMENT}
+  ${APPROACH_FRAGMENT}
 `
 
 const TASK_INFO = `
-query taskInfo($taskId: ID!) {
+  query taskInfo($taskId: ID!) {
     taskInfo(id: $taskId) {
- ...FullTaskData
-   }
+      ...FullTaskData
+    }
   }
   ${FULL_TASK_FRAGMENT}
 `
@@ -33,9 +34,11 @@ export default function TaskPage({ taskId }) {
   const [highlightedApproachId, setHighlightedApproachId] = useState()
 
   useEffect(() => {
-    request(TASK_INFO, { variables: { taskId } }).then(({ data }) => {
-      setTaskInfo(data.taskInfo)
-    })
+    if (!taskInfo) {
+      request(TASK_INFO, { variables: { taskId } }).then(({ data }) => {
+        setTaskInfo(data.taskInfo)
+      })
+    }
   }, [taskId, taskInfo, request])
 
   if (!taskInfo) {

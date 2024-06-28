@@ -1,9 +1,10 @@
 import {
   GraphQLInputObjectType,
-  GraphQLList,
-  GraphQLNonNull,
   GraphQLString,
+  GraphQLNonNull,
+  GraphQLList,
 } from "graphql"
+
 import ApproachDetailInput from "./input-approach-detail"
 
 const ApproachInput = new GraphQLInputObjectType({

@@ -7,7 +7,7 @@ const USER_CREATE = `
 mutation userCreate($input: UserInput!) {
 userCreate(input: $input) {
 errors {
-message
+  message
         }
     user {
     id

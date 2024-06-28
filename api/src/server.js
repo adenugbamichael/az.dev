@@ -7,8 +7,10 @@ import cors from "cors"
 import morgan from "morgan"
 
 import * as config from "./config"
+
 import pgApiWrapper from "./db/pg-api"
 import mongoApiWrapper from "./db/mongo-api"
+
 import DataLoader from "dataloader"
 
 async function main() {
@@ -35,27 +37,22 @@ async function main() {
     const loaders = {
       users: new DataLoader((userIds) => pgApi.usersInfo(userIds)),
       approachLists: new DataLoader((taskIds) => pgApi.approachLists(taskIds)),
-
-      tasks: new DataLoader((taskIds) => pgApi.tasksInfo({taskIds, currentUser})),
-
-      tasksByTypes: new DataLoader((types) => pgApi.tasksByTypes(types)),
-
-      searchResults: new DataLoader((searchTerms) =>
-        pgApi.searchResults({searchTerms, currentUser})
+      tasks: new DataLoader((taskIds) =>
+        pgApi.tasksInfo({ taskIds, currentUser })
       ),
-      
+      tasksByTypes: new DataLoader((types) => pgApi.tasksByTypes(types)),
+      searchResults: new DataLoader((searchTerms) =>
+        pgApi.searchResults({ searchTerms, currentUser })
+      ),
       detailLists: new DataLoader((approachIds) =>
         mongoApi.detailLists(approachIds)
       ),
-      tasksForUsers: new DataLoader((userIds) => 
-        pgApi.tasksForUsers(userIds),
-      ),
+      tasksForUsers: new DataLoader((userIds) => pgApi.tasksForUsers(userIds)),
     }
     const mutators = {
       ...pgApi.mutators,
       ...mongoApi.mutators,
     }
-
     graphqlHTTP({
       schema,
       context: { loaders, mutators, currentUser },

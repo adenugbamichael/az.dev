@@ -6,15 +6,15 @@ import Errors from "./Errors"
 export const APPROACH_FRAGMENT = `
   fragment ApproachFragment on Approach {
     content
-     voteCount
+    voteCount
     author {
       username
+    }
+    detailList {
+      content
+      category
+    }
   }
-  detailList {
-    content
-    category
-  }
-}
 `
 
 export default function Approach({ approach, isHighlighted }) {

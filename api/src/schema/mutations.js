@@ -1,12 +1,13 @@
-import { GraphQLID, GraphQLNonNull, GraphQLObjectType } from "graphql"
+import { GraphQLObjectType, GraphQLNonNull, GraphQLID } from "graphql"
+
 import UserPayload from "./types/payload-user"
 import UserInput from "./types/input-user"
 import AuthInput from "./types/input-auth"
-import TaskInput from "./types/input-task"
 import TaskPayload from "./types/payload-task"
+import TaskInput from "./types/input-task"
 import ApproachPayload from "./types/payload-approach"
-import ApproachDetailInput from "./types/input-approach-detail"
-import ApproachVoteInputType from "./types/input-approach-vote"
+import ApproachInput from "./types/input-approach"
+import ApproachVoteInput from "./types/input-approach-vote"
 import UserDeletePayload from "./types/payload-user-delete"
 
 const MutationType = new GraphQLObjectType({
@@ -30,7 +31,6 @@ const MutationType = new GraphQLObjectType({
         return mutators.userLogin({ input })
       },
     },
-
     taskCreate: {
       type: TaskPayload,
       args: {
@@ -44,7 +44,7 @@ const MutationType = new GraphQLObjectType({
       type: ApproachPayload,
       args: {
         taskId: { type: new GraphQLNonNull(GraphQLID) },
-        input: { type: new GraphQLNonNull(ApproachDetailInput) },
+        input: { type: new GraphQLNonNull(ApproachInput) },
       },
       resolve: async (source, { taskId, input }, { mutators, currentUser }) => {
         return mutators.approachCreate({
@@ -59,7 +59,7 @@ const MutationType = new GraphQLObjectType({
       type: ApproachPayload,
       args: {
         approachId: { type: new GraphQLNonNull(GraphQLID) },
-        input: { type: new GraphQLNonNull(ApproachVoteInputType) },
+        input: { type: new GraphQLNonNull(ApproachVoteInput) },
       },
       resolve: async (source, { approachId, input }, { mutators }) => {
         return mutators.approachVote({ approachId, input })
@@ -73,4 +73,5 @@ const MutationType = new GraphQLObjectType({
     },
   }),
 })
+
 export default MutationType

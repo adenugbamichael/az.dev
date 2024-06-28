@@ -2,10 +2,11 @@ import {
   GraphQLID,
   GraphQLObjectType,
   GraphQLString,
-  GraphQLList,
   GraphQLInt,
   GraphQLNonNull,
+  GraphQLList,
 } from "graphql"
+
 import User from "./user"
 import Task from "./task"
 import SearchResultItem from "./search-result-item"

@@ -6,15 +6,17 @@ import {
   GraphQLNonNull,
   GraphQLList,
 } from "graphql"
+
 import NumbersInRange from "./types/numbers-in-range"
 import { numbersInRangeObject } from "../utils"
+
 import Task from "./types/task"
 import SearchResultItem from "./types/search-result-item"
-import  { Me } from "./types/user"
+import { Me } from "./types/user"
 
 const QueryType = new GraphQLObjectType({
   name: "Query",
-  fields: () => ({
+  fields: {
     currentTime: {
       type: GraphQLString,
       resolve: () => {
@@ -60,11 +62,11 @@ const QueryType = new GraphQLObjectType({
     },
     me: {
       type: Me,
-      resolve: async (source, args, { currentUser}) => {
+      resolve: async (source, args, { currentUser }) => {
         return currentUser
-      }
-    }
-  }),
+      },
+    },
+  },
 })
 
 export default QueryType

@@ -1,11 +1,13 @@
-import { randomString } from "../utils"
 import pgClient from "./pg-client"
 import sqls from "./sqls"
+
+import { randomString } from "../utils"
 
 const pgApiWrapper = async () => {
   const { pgPool } = await pgClient()
   const pgQuery = (text, params = {}) =>
     pgPool.query(text, Object.values(params))
+
   return {
     userFromAuthToken: async (authToken) => {
       if (!authToken) {
@@ -16,6 +18,16 @@ const pgApiWrapper = async () => {
       })
       return pgResp.rows[0]
     },
+
+    tasksForUsers: async (userIds) => {
+      const pgResp = await pgQuery(sqls.tasksForUsers, {
+        $1: userIds,
+      })
+      return userIds.map((userId) =>
+        pgResp.rows.filter((row) => userId === row.userId)
+      )
+    },
+
     tasksByTypes: async (types) => {
       const results = types.map(async (type) => {
         if (type === "latest") {
@@ -25,14 +37,6 @@ const pgApiWrapper = async () => {
         throw Error("Unsupported type")
       })
       return Promise.all(results)
-    },
-    tasksForUsers: async (userIds) => {
-      const pgResp = await pgQuery(sqls.tasksForUsers, {
-        $1: userIds,
-      })
-      return userIds.map((userId) =>
-        pgResp.rows.filter((row) => userId === row.userId)
-      )
     },
     usersInfo: async (userIds) => {
       const pgResp = await pgQuery(sqls.usersFromIds, { $1: userIds })
@@ -67,6 +71,7 @@ const pgApiWrapper = async () => {
       })
       return Promise.all(results)
     },
+
     mutators: {
       userCreate: async ({ input }) => {
         const payload = { errors: [] }
@@ -77,20 +82,16 @@ const pgApiWrapper = async () => {
         }
         if (payload.errors.length === 0) {
           const authToken = randomString()
-          try {
-            const pgResp = await pgQuery(sqls.userInsert, {
-              $1: input.username.toLowerCase(),
-              $2: input.password,
-              $3: input.firstName,
-              $4: input.lastName,
-              $5: authToken,
-            })
-            if (pgResp.rows[0]) {
-              payload.user = pgResp.rows[0]
-              payload.authToken = authToken
-            }
-          } catch (err) {
-            console.log(err)
+          const pgResp = await pgQuery(sqls.userInsert, {
+            $1: input.username.toLowerCase(),
+            $2: input.password,
+            $3: input.firstName,
+            $4: input.lastName,
+            $5: authToken,
+          })
+          if (pgResp.rows[0]) {
+            payload.user = pgResp.rows[0]
+            payload.authToken = authToken
           }
         }
         return payload
@@ -138,10 +139,12 @@ const pgApiWrapper = async () => {
             $3: input.tags.join(","),
             $4: input.isPrivate,
           })
+
           if (pgResp.rows[0]) {
             payload.task = pgResp.rows[0]
           }
         }
+
         return payload
       },
       approachCreate: async ({ taskId, input, currentUser, mutators }) => {
@@ -163,6 +166,7 @@ const pgApiWrapper = async () => {
             )
           }
         }
+
         return payload
       },
       approachVote: async ({ approachId, input }) => {
@@ -171,9 +175,11 @@ const pgApiWrapper = async () => {
           $1: approachId,
           $2: input.up ? 1 : -1,
         })
+
         if (pgResp.rows[0]) {
           payload.approach = pgResp.rows[0]
         }
+
         return payload
       },
       userDelete: async ({ currentUser }) => {
@@ -188,9 +194,11 @@ const pgApiWrapper = async () => {
             message: "We were not able to delete this account",
           })
         }
+
         return payload
       },
     },
   }
 }
+
 export default pgApiWrapper

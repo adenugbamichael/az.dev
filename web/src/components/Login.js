@@ -7,7 +7,7 @@ const USER_LOGIN = `
 mutation userLogin($input: AuthInput!) {
 userLogin(input: $input) {
 errors {
-message
+  message
     }
   user {
       id
