@@ -1,7 +1,10 @@
 import React, { useState } from "react"
-import fetch from "cross-fetch"
-
 import * as config from "./config"
+import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client"
+
+const httpLink = new HttpLink({ uri: config.GRAPHQL_SERVER_URL })
+const cache = new InMemoryCache()
+const client = new ApolloClient({ link: httpLink, cache })
 
 const initialLocalAppState = {
   component: { name: "Home", props: {} },
@@ -55,29 +58,21 @@ export const useStoreObject = () => {
     )
   }
 
-  // This function should make an ajax call to GraphQL server
-  // and return the GraphQL response object
-  const request = async (requestText, { variables } = {}) => {
-    const headers = state.user
-      ? {
-          Authorization: "Bearer " + state.user.authToken,
-        }
-      : {}
-    const gsResp = await fetch(config.GRAPHQL_SERVER_URL, {
-      method: "post",
-      headers: { ...headers, "Content-Type": "application/json" },
-      body: JSON.stringify({ query: requestText, variables }),
-    }).then((response) => response.json())
-    return gsResp
+  const query = async (query, { variables } = {}) => {
+    const resp = await client.query({ query, variables })
+    return resp
+  }
+  const mutate = async (mutation, { variables } = {}) => {
+    const resp = await client.mutate({ mutation, variables })
+    return resp
   }
 
-  // In React components, the following is the object you get
-  // when you make a useStore() call
   return {
     useLocalAppState,
     setLocalAppState,
     AppLink,
-    request,
+    query,
+    mutate,
   }
 }
 

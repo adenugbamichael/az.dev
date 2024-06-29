@@ -3,30 +3,31 @@ import React, { useState, useEffect } from "react"
 import { useStore } from "../store"
 import Search from "./Search"
 import TaskSummary, { TASK_SUMMARY_FRAGMENT } from "./TaskSummary"
+import { gql } from "@apollo/client"
 
 /** GIA NOTES
  * Define GraphQL operations here...
  */
 
-const TASK_MAIN_LIST = `
-query taskMainList {
-  taskMainList {
-  id
-...TaskSummary
+const TASK_MAIN_LIST = gql`
+  query taskMainList {
+    taskMainList {
+      id
+      ...TaskSummary
+    }
   }
-}
-${TASK_SUMMARY_FRAGMENT}
+  ${TASK_SUMMARY_FRAGMENT}
 `
 
 export default function Home() {
-  const { request } = useStore()
+  const { query } = useStore()
   const [taskList, setTaskList] = useState(null)
 
   useEffect(() => {
-    request(TASK_MAIN_LIST).then(({ data }) => {
+    query(TASK_MAIN_LIST).then(({ data }) => {
       setTaskList(data.taskMainList)
     })
-  }, [request])
+  }, [query])
 
   if (!taskList) {
     return <div className='loading'>Loading...</div>
