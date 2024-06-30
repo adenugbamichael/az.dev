@@ -56,12 +56,9 @@ export default function TaskPage({ taskId }) {
 
   const { taskInfo } = data
 
-  const handleAddNewApproach = (newApproach) => {
-    // setTaskInfo((pTask) => ({
-    //   ...pTask,
-    //   approachList: [newApproach, ...pTask.approachList],
-    // }))
-    setHighlightedApproachId(newApproach.id)
+  const handleAddNewApproach = (addNewApproach) => {
+    const newApproachId = addNewApproach(taskInfo)
+    setHighlightedApproachId(newApproachId)
     setShowAddApproach(false)
   }
 
