@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 
 import { useStore } from "../store"
 import NewApproach from "./NewApproach"
 import Approach, { APPROACH_FRAGMENT } from "./Approach"
 import TaskSummary, { TASK_SUMMARY_FRAGMENT } from "./TaskSummary"
-import { gql } from "@apollo/client"
+import { gql, useQuery } from "@apollo/client"
 
 export const FULL_TASK_FRAGMENT = `
   fragment FullTaskData on Task {
@@ -29,28 +29,38 @@ const TASK_INFO = gql`
 `
 
 export default function TaskPage({ taskId }) {
-  const { query, AppLink } = useStore()
-  const [taskInfo, setTaskInfo] = useState(null)
+  const { AppLink } = useStore()
+  // const [taskInfo, setTaskInfo] = useState(null)
   const [showAddApproach, setShowAddApproach] = useState(false)
   const [highlightedApproachId, setHighlightedApproachId] = useState()
 
-  useEffect(() => {
-    if (!taskInfo) {
-      query(TASK_INFO, { variables: { taskId } }).then(({ data }) => {
-        setTaskInfo(data.taskInfo)
-      })
-    }
-  }, [taskId, taskInfo, query])
+  // useEffect(() => {
+  //   if (!taskInfo) {
+  //     query(TASK_INFO, { variables: { taskId } }).then(({ data }) => {
+  //       setTaskInfo(data.taskInfo)
+  //     })
+  //   }
+  // }, [taskId, taskInfo, query])
 
-  if (!taskInfo) {
+  const { error, loadding, data } = useQuery(TASK_INFO, {
+    variables: { taskId },
+  })
+
+  if (error) {
+    return <div className='error'>{error.message}</div>
+  }
+
+  if (loadding) {
     return <div className='loading'>Loading...</div>
   }
 
+  const { taskInfo } = data
+
   const handleAddNewApproach = (newApproach) => {
-    setTaskInfo((pTask) => ({
-      ...pTask,
-      approachList: [newApproach, ...pTask.approachList],
-    }))
+    // setTaskInfo((pTask) => ({
+    //   ...pTask,
+    //   approachList: [newApproach, ...pTask.approachList],
+    // }))
     setHighlightedApproachId(newApproach.id)
     setShowAddApproach(false)
   }

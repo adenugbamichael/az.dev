@@ -69,21 +69,11 @@ export const useStoreObject = () => {
   })
   client.setLink(authLink.concat(httpLink))
 
-  const query = async (query, { variables } = {}) => {
-    const resp = await client.query({ query, variables })
-    return resp
-  }
-  const mutate = async (mutation, { variables } = {}) => {
-    const resp = await client.mutate({ mutation, variables })
-    return resp
-  }
-
   return {
     useLocalAppState,
     setLocalAppState,
     AppLink,
-    query,
-    mutate,
+    client,
   }
 }
 
